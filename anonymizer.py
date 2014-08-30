@@ -78,7 +78,7 @@ if __name__ == '__main__':
         if len_argv > 2:
             K = int(sys.argv[2])
             L = int(sys.argv[3])
-            get_result_one(att_trees, data)
+            get_result_one(att_trees, data, K, L)
         else:
             get_result_one(att_trees, data)
     else:
