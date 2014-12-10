@@ -27,7 +27,6 @@ def Separation_Gen(att_trees, data, K=10, L=5):
             gl_data[t][-1] = tran_value[:]
             partition_data.append(gl_data[t][:])
     print "Begin Mondrian"
-    print "L=%d" % L
     result = mondrian_l_diversity(gl_att_trees, partition_data, L)
     print("--- %s seconds ---" % (time.time()-start_time))
     # transform data format (QID1,.., QIDn, SA set, GroupID, 1/|group size|, Group SA domain)

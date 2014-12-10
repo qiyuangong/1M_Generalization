@@ -81,6 +81,8 @@ if __name__ == '__main__':
             get_result_one(att_trees, data, K, L)
         else:
             get_result_one(att_trees, data)
+    elif flag =='':
+        get_result_one(att_trees, data)
     else:
         print "Usage: python anonymizer [k | l | data | one]"
     print "Finish 1M_Separation_Gen_KL!!"
