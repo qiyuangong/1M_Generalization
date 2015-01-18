@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 #coding=utf-8
 from Separation_Gen import Separation_Gen
+from utils.make_tree import gen_gh_tree
 from utils.read_data import read_data, read_tree
 from utils.save_result import save_to_file
 import sys, copy
@@ -63,9 +64,11 @@ if __name__ == '__main__':
     #read record
     K = 10
     L = 5
+    # make generalization hierarchies
+    gen_gh_tree()
     #read gentree tax
     att_trees = read_tree()
-    #read record
+    # read record
     data = read_data()
     # Separation_Gen need only GH for transaction
     if flag == 'k':
@@ -86,4 +89,5 @@ if __name__ == '__main__':
     else:
         print "Usage: python anonymizer [k | l | data | one]"
     print "Finish 1M_Separation_Gen_KL!!"
+    print '*'*30
     

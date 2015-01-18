@@ -5,7 +5,7 @@
 # user att ['DUID','PID','DUPERSID','DOBMM','DOBYY','SEX','RACEX','RACEAX','RACEBX','RACEWX','RACETHNX','HISPANX','HISPCAT','EDUCYEAR','Year','marry','income','poverty']
 # condition att ['DUID','DUPERSID','ICD9CODX','year']
 from models.gentree import GenTree
-from models.numrange import NumRange
+from utils.make_tree import pickle_static
 import pickle
 
 __DEBUG = False
@@ -14,12 +14,6 @@ gl_conditionatt = ['DUID','DUPERSID','ICD9CODX','year']
 # Only 5 relational attributes and 1 transaction attribute are selected (according to Poulis's paper)
 gl_attlist = [3,4,6,13,16]
 gl_if_cat = [True,True,True,True,False,True]
-
-
-def cmp_str(element1, element2):
-    """compare number in str format correctley
-    """
-    return cmp(int(element1), int(element2))
 
 
 def read_tree(flag=0):
@@ -39,39 +33,6 @@ def read_tree(flag=0):
         else:
             att_trees.append(pickle_static(gl_attlist[i]))
     return att_trees
-
-
-def pickle_static(index):
-    """pickle sorted values of BMS-WebView-2 to BMS_Static_value.pickle
-    """
-    userfile = open('data/demographics05test.csv', 'rU')
-    need_static = False
-    support = {}
-    try:
-        static_file = open('data/income_Static_value.pickle', 'rb')
-        print "Data exist..."
-        (support,sort_value) = pickle.load(static_file)
-    except:
-        need_static = True
-        static_file = open('data/income_Static_value.pickle', 'wb')
-        print "Pickle Data..."
-        for i, line in enumerate(userfile):
-            line = line.strip()
-            if i == 0:
-                continue
-            # ignore first line of csv
-            row = line.split(',')
-            try:
-                support[row[index]] += 1
-            except:
-                support[row[index]] = 1
-        sort_value = support.keys()
-        sort_value.sort(cmp=cmp_str)
-        pickle.dump((support,sort_value), static_file)
-    static_file.close()
-    userfile.close()
-    result = NumRange(sort_value,support)
-    return result
 
 
 def read_tree_file(treename):
@@ -111,8 +72,8 @@ def read_data(flag=0):
     """
     """read microda for *.txt and return read data"""
     data = []
-    userfile = open('data/demographics05test.csv', 'rU')
-    conditionfile = open('data/conditions05.csv', 'rU')
+    userfile = open('data/demographics.csv', 'rU')
+    conditionfile = open('data/conditions.csv', 'rU')
     userdata = {}
     # We selet 3,4,5,6,13,15,15 att from demographics05, and 2 from condition05
     print "Reading Data..."
