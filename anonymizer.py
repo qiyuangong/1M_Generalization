@@ -1,13 +1,11 @@
 #!/usr/bin/env python
 #coding=utf-8
 from Separation_Gen import Separation_Gen
-from utils.make_tree import gen_gh_tree
+from utils.make_tree import gen_gh_trees
 from utils.read_data import read_data, read_tree
 from utils.save_result import save_to_file
 import sys, copy
 import pdb
-
-
 
 # set k=10, l=5 as default!
 
@@ -64,8 +62,9 @@ if __name__ == '__main__':
     #read record
     K = 10
     L = 5
+    print '*'*30
     # make generalization hierarchies
-    gen_gh_tree()
+    gen_gh_trees()
     #read gentree tax
     att_trees = read_tree()
     # read record

@@ -11,10 +11,9 @@ def cmp_str(element1, element2):
     return cmp(int(element1), int(element2))
 
 
-def gen_gh_tree():
+def gen_gh_trees():
     """gen all tress from treeseed file or static
     """
-    print '*'*30
     gen_even_tree(5)
     gen_even_income_tree(5)
     gen_DOBYY_tree()
@@ -25,11 +24,11 @@ def gen_even_tree(fanout):
     """This generalization hierarchy is defined according to even fan-out (average distribution).
     For large dataset fanout = 5, for small dataset fanout = 4
     """
-    treeseed = open('data/treeseed_even.txt','rU')
     try:
         treefile = open('data/treefile_even.txt','rU')
         print "ICD09 even tree exists"
     except:        
+        treeseed = open('data/treeseed_even.txt','rU')
         treefile = open('data/treefile_even.txt','w')
         for line in treeseed:
             line = line.strip()
@@ -77,7 +76,7 @@ def gen_even_tree(fanout):
                     temp /= fanout
                 w_line += line + ';*\n'
                 treefile.write(w_line)
-    treeseed.close()
+        treeseed.close()
     treefile.close()
 
 
@@ -161,7 +160,7 @@ def pickle_static(index):
     support = {}
     try:
         static_file = open('data/income_Static_value.pickle', 'rb')
-        # print "Data exist..."
+        # print "Income pickle Data exist..."
         result = pickle.load(static_file)
     except:
         need_static = True
