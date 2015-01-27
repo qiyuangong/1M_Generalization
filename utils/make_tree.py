@@ -1,9 +1,10 @@
 #!/usr/bin/env python
-#coding=utf-8
+# coding=utf-8
 import string
 import math
 import pickle
 from models.numrange import NumRange
+
 
 def cmp_str(element1, element2):
     """compare number in str format correctley
@@ -19,17 +20,17 @@ def gen_gh_trees():
     gen_DOBYY_tree()
 
 
-#generate tree from treeseed
+# generate tree from treeseed
 def gen_even_tree(fanout):
     """This generalization hierarchy is defined according to even fan-out (average distribution).
     For large dataset fanout = 5, for small dataset fanout = 4
     """
     try:
-        treefile = open('data/treefile_even.txt','rU')
+        treefile = open('data/treefile_even.txt', 'rU')
         print "ICD09 even tree exists"
-    except:        
-        treeseed = open('data/treeseed_even.txt','rU')
-        treefile = open('data/treefile_even.txt','w')
+    except:
+        treeseed = open('data/treeseed_even.txt', 'rU')
+        treefile = open('data/treefile_even.txt', 'w')
         for line in treeseed:
             line = line.strip()
             temp = line.split(',')
@@ -58,13 +59,13 @@ def gen_even_tree(fanout):
                 while temp <= top:
                     stemp = ''
                     if level_len == 1:
-                        stemp = prefix+str(temp).rjust(str_len, '0')
-                    elif temp+level_len-1 > top:
-                        stemp = prefix+str(temp).rjust(str_len, '0')
-                        stemp += ','+ prefix+str(top).rjust(str_len, '0')
+                        stemp = prefix + str(temp).rjust(str_len, '0')
+                    elif temp + level_len - 1 > top:
+                        stemp = prefix + str(temp).rjust(str_len, '0')
+                        stemp += ',' + prefix + str(top).rjust(str_len, '0')
                     else:
-                        stemp = prefix+str(temp).rjust(str_len, '0')
-                        stemp += ','+ prefix+str(temp+level_len-1).rjust(str_len, '0')
+                        stemp = prefix + str(temp).rjust(str_len, '0')
+                        stemp += ',' + prefix + str(temp + level_len - 1).rjust(str_len, '0')
                     level_split.append(stemp)
                     temp += level_len
                 tree.append(level_split)
@@ -83,17 +84,17 @@ def gen_even_tree(fanout):
 def gen_DOBYY_tree():
     "We define a birth year tree with min = 1900 and max = 2010, and coverage splited by 5, 10, 50 year"
     try:
-        treefile = open('data/treefile_DOBYY.txt','rU')
+        treefile = open('data/treefile_DOBYY.txt', 'rU')
         print "DOBYY tree exists"
     except:
-        treefile = open('data/treefile_DOBYY.txt','w')
+        treefile = open('data/treefile_DOBYY.txt', 'w')
         for i in range(1900, 2011):
             i1 = i / 5
             i2 = i / 10
             i3 = i / 50
             i4 = i / 100
-            temp = '%d;%d,%d;%d,%d;%d,%d;%d,%d;*\n' % (i, i1 * 5 , i1 * 5 + 4, i2*10,\
-                 i2*10 + 9, i3*50, i3*50 + 49, i4*100, i4*100 + 99)
+            temp = '%d;%d,%d;%d,%d;%d,%d;%d,%d;*\n' % (i, i1 * 5, i1 * 5 + 4, i2 * 10,
+                                                       i2 * 10 + 9, i3 * 50, i3 * 50 + 49, i4 * 100, i4 * 100 + 99)
             treefile.write(temp)
     treefile.close()
 
@@ -138,13 +139,13 @@ def gen_even_income_tree(fanout):
             for h in range(height):
                 if h == 0:
                     temp = '%s' % static_value[i]
-                else:    
+                else:
                     window = fanout ** h
                     times = i / window
                     bottom = times * window
-                    top = (times+1) * window - 1
+                    top = (times + 1) * window - 1
                     if top >= len(static_value):
-                        top = len(static_value)-1 
+                        top = len(static_value) - 1
                     temp = '%s,%s' % (static_value[bottom], static_value[top])
                 node.append(temp)
             node.append('*')
@@ -178,7 +179,7 @@ def pickle_static(index):
                 support[row[index]] = 1
         sort_value = support.keys()
         sort_value.sort(cmp=cmp_str)
-        result = NumRange(sort_value,support)
+        result = NumRange(sort_value, support)
         pickle.dump(result, static_file)
     static_file.close()
     userfile.close()

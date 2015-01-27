@@ -1,15 +1,15 @@
 #!/usr/bin/env python
-#coding=utf-8
+# coding=utf-8
 
 # store
 
 import socket
 import pickle
 from datetime import datetime
-from utils.ftp_upload import ftp_upload
+
 
 def save_to_file(result, flag=0):
-    """save results to files 
+    """save results to files
     if flag=0, then pickle (att_trees, data, result, K, L)) to file
     else, save result to file
     """
@@ -23,17 +23,14 @@ def save_to_file(result, flag=0):
     if flag:
         # write file in text
         # only restore result
-        file_result = open(file_path + file_name,'w')
+        file_result = open(file_path + file_name, 'w')
         for record in result[2]:
             line = ';'.join(record) + '\n'
             file_result.write(line)
     else:
         # write file using pickle
-        file_result = open(file_path + file_name,'wb')
+        file_result = open(file_path + file_name, 'wb')
         pickle.dump(result, file_result)
     file_result.close()
-    # try:
-    #     ftp_upload(file_name, file_path)
-    # except:
-    #     print "Upload Fail!"
+
     print "Save Complete!"

@@ -1,13 +1,15 @@
 #!/usr/bin/env python
-#coding=utf-8
+# coding=utf-8
 from Separation_Gen import Separation_Gen
 from utils.make_tree import gen_gh_trees
 from utils.read_data import read_data, read_tree
 from utils.save_result import save_to_file
-import sys, copy
+import sys
+import copy
 import pdb
 
 # set k=10, l=5 as default!
+
 
 def get_result_one(att_trees, data, K=10, L=5):
     "fix K=10, L=5"
@@ -43,7 +45,7 @@ def get_result_dataset(att_trees, data, K=10, L=5):
     h = length / joint
     if length % joint == 0:
         h += 1
-    for i in range(1, h+1):
+    for i in range(1, h + 1):
         pos = i * joint
         if pos > length:
             continue
@@ -59,13 +61,13 @@ if __name__ == '__main__':
         flag = sys.argv[1]
     except:
         pass
-    #read record
+    # read record
     K = 10
     L = 5
-    print '*'*30
+    print '*' * 30
     # make generalization hierarchies
     gen_gh_trees()
-    #read gentree tax
+    # read gentree tax
     att_trees = read_tree()
     # read record
     data = read_data()
@@ -83,10 +85,9 @@ if __name__ == '__main__':
             get_result_one(att_trees, data, K, L)
         else:
             get_result_one(att_trees, data)
-    elif flag =='':
+    elif flag == '':
         get_result_one(att_trees, data)
     else:
         print "Usage: python anonymizer [k | l | data | one]"
     print "Finish 1M_Separation_Gen_KL!!"
-    print '*'*30
-    
+    print '*' * 30

@@ -8,8 +8,9 @@ _DEBUG = True
 gl_att_trees = []
 gl_data = []
 
+
 def Separation_Gen(att_trees, data, K=10, L=5):
-    """Using partition_for_transaction to anonymize SA (transaction) partition, 
+    """Using partition_for_transaction to anonymize SA (transaction) partition,
     while applying anatomy to separate QID and SA
     """
     global gl_att_trees, gl_data
@@ -28,7 +29,7 @@ def Separation_Gen(att_trees, data, K=10, L=5):
             partition_data.append(gl_data[t][:])
     print "Begin Mondrian"
     result = mondrian_l_diversity(gl_att_trees, partition_data, L)
-    print("--- %s seconds ---" % (time.time()-start_time))
+    print("--- %s seconds ---" % (time.time() - start_time))
     # transform data format (QID1,.., QIDn, SA set, GroupID, 1/|group size|, Group SA domain)
     # 1/|group size|, Group SA domain will be used in evaluation
     return result

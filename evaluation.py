@@ -1,10 +1,14 @@
 #!/usr/bin/env python
-#coding=utf-8
+# coding=utf-8
 
 from models.gentree import GenTree
 from os import walk
 import pdb
-import math, random, pickle, sys, copy
+import math
+import random
+import pickle
+import sys
+import copy
 
 
 _DEBUG = False
@@ -44,7 +48,7 @@ def count_query(data, att_select, value_select):
         for i in range(lenquery):
             index = att_select[i]
             value = value_select[i]
-            if isinstance(record[index],list): 
+            if isinstance(record[index], list):
                 record_set = set(record[index])
             else:
                 record_set = set([record[index]])
@@ -71,11 +75,11 @@ def est_query(data, att_select, value_select):
     for record in data:
         est_value = 0.0
         for i in range(lenquery):
-            if i == lenquery-1:
+            if i == lenquery - 1:
                 index = -2
             index = att_select[i]
             value = value_select[i]
-            if isinstance(record[index],list): 
+            if isinstance(record[index], list):
                 record_set = set(record[index])
             else:
                 record_set = set([record[index]])
@@ -84,7 +88,7 @@ def est_query(data, att_select, value_select):
                 # some one tell me that set are much faster
                 if t in record_set:
                     flag = True
-                    if i == lenquery-1:
+                    if i == lenquery - 1:
                         est_value += record[-3] * record[-1][t]
                     break
             if not flag:
@@ -106,7 +110,7 @@ def average_relative_error(att_trees, data, result, qd=2, s=5):
     blist = []
     att_roots = [t['*'] for t in att_trees]
     att_cover = [t.cover.keys() for t in att_roots]
-    seed = math.pow(s*1.0/100, 1.0/(qd +1))
+    seed = math.pow(s * 1.0 / 100, 1.0 / (qd + 1))
     # transform generalized result to coverage
     tran_result = copy.deepcopy(result)
     for temp in tran_result:
@@ -128,13 +132,13 @@ def average_relative_error(att_trees, data, result, qd=2, s=5):
         value_select = []
         i = 0
         # select QI att
-        att_select = random.sample(range(0, len_att-1), qd)
+        att_select = random.sample(range(0, len_att - 1), qd)
         # append SA. So len(att_select) == qd+1
-        att_select.append(len_att-1)
+        att_select.append(len_att - 1)
         if _DEBUG:
             print "ARE %d" % turn
             print "Att select %s" % att_select
-        for i in range(qd+1):
+        for i in range(qd + 1):
             index = att_select[i]
             temp = []
             count = 0
@@ -148,7 +152,7 @@ def average_relative_error(att_trees, data, result, qd=2, s=5):
             zeroare += 1
     print "Times = %d when Query on microdata is Zero" % zeroare
     if q_times == zeroare:
-        return 0            
+        return 0
     return are / (q_times - zeroare)
 
 
@@ -159,12 +163,12 @@ def evaluate_one(file_list, qd=2, s=5):
         if '26854K10L5.txt' in t:
             file_name = t
             break
-    file_result = open('output/'+file_name,'rb')
+    file_result = open('output/' + file_name, 'rb')
     (att_trees, data, result, K, L) = pickle.load(file_result)
     file_result.close()
     print "K=%d, L=%d" % (K, L)
     are = average_relative_error(att_trees, data, result, qd, s)
-    print "Average Relative Error: %.2f%%" % (are*100)
+    print "Average Relative Error: %.2f%%" % (are * 100)
 
 
 def evaluate_s(file_list, qd=2):
@@ -174,14 +178,14 @@ def evaluate_s(file_list, qd=2):
         if '26854K10L5.txt' in t:
             file_name = t
             break
-    file_result = open('output/'+file_name,'rb')
+    file_result = open('output/' + file_name, 'rb')
     (att_trees, data, result, K, L) = pickle.load(file_result)
     file_result.close()
     print "K=%d, L=%d" % (K, L)
     for s in range(1, 10):
-        print '-'*30
+        print '-' * 30
         are = average_relative_error(att_trees, data, result, qd, s)
-        print "Average Relative Error: %.2f%%" % (are*100)
+        print "Average Relative Error: %.2f%%" % (are * 100)
 
 
 def evaluate_qd(file_list, s=5):
@@ -191,14 +195,14 @@ def evaluate_qd(file_list, s=5):
         if '26854K10L5.txt' in t:
             file_name = t
             break
-    file_result = open('output/'+file_name,'rb')
+    file_result = open('output/' + file_name, 'rb')
     (att_trees, data, result, K, L) = pickle.load(file_result)
     file_result.close()
     print "K=%d, L=%d" % (K, L)
     for qd in range(1, 6):
-        print '-'*30
+        print '-' * 30
         are = average_relative_error(att_trees, data, result, qd, s)
-        print "Average Relative Error: %.2f%%" % (are*100)
+        print "Average Relative Error: %.2f%%" % (are * 100)
 
 
 def evaluate_dataset(file_list, qd=2, s=5):
@@ -206,16 +210,16 @@ def evaluate_dataset(file_list, qd=2, s=5):
     """
     file_list = [t for t in file_list if 'K10L5.txt' in t]
     for file_name in file_list:
-        file_result = open('output/'+file_name,'rb')
+        file_result = open('output/' + file_name, 'rb')
         (att_trees, data, result, K, L) = pickle.load(file_result)
         file_result.close()
-        print '-'*30
+        print '-' * 30
         are = average_relative_error(att_trees, data, result, qd, s)
-        print "Average Relative Error: %.2f%%" % (are*100)
-    
+        print "Average Relative Error: %.2f%%" % (are * 100)
+
 
 def evaluate_K(file_list, qd=2, s=5):
-    """evaluate K, while fixing L, qd, s 
+    """evaluate K, while fixing L, qd, s
     """
     str_list = []
     # we only compute K=5*n <= 50
@@ -229,13 +233,13 @@ def evaluate_K(file_list, qd=2, s=5):
                 check_list.append(filename)
                 break
     for file_name in check_list:
-        file_result = open('output/'+file_name,'rb')
+        file_result = open('output/' + file_name, 'rb')
         (att_trees, data, result, K, L) = pickle.load(file_result)
         file_result.close()
-        print '-'*30
+        print '-' * 30
         print "K=%d, L=%d" % (K, L)
         are = average_relative_error(att_trees, data, result, qd, s)
-        print "Average Relative Error: %.2f%%" % (are*100)
+        print "Average Relative Error: %.2f%%" % (are * 100)
 
 
 def evaluate_L(file_list, qd=2, s=5):
@@ -253,14 +257,13 @@ def evaluate_L(file_list, qd=2, s=5):
                 check_list.append(filename)
                 break
     for file_name in check_list:
-        file_result = open('output/'+file_name,'rb')
+        file_result = open('output/' + file_name, 'rb')
         (att_trees, data, result, K, L) = pickle.load(file_result)
         file_result.close()
-        print '-'*30
+        print '-' * 30
         print "K=%d, L=%d" % (K, L)
         are = average_relative_error(att_trees, data, result, qd, s)
-        print "Average Relative Error: %.2f%%" % (are*100)
-
+        print "Average Relative Error: %.2f%%" % (are * 100)
 
 
 if __name__ == '__main__':
@@ -292,5 +295,3 @@ if __name__ == '__main__':
         evaluate_L(file_list)
     else:
         print "Usage: python evaluation [qd | s | are]"
-   
-            
