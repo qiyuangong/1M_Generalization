@@ -7,7 +7,7 @@ from models.numrange import NumRange
 from models.gentree import GenTree
 
 
-__DEBUG = True
+__DEBUG = False
 gl_QI_len = 10
 gl_L = 0
 gl_result = []
@@ -233,7 +233,6 @@ def anonymize(partition):
 def mondrian_l_diversity(att_trees, data, L):
     """
     """
-    print "L=%d" % L
     global gl_L, gl_result, gl_QI_len, gl_att_trees, gl_QI_range
     gl_att_trees = att_trees
     middle = []
@@ -265,9 +264,10 @@ def mondrian_l_diversity(att_trees, data, L):
     ncp /= len(data)
     ncp *= 100
     if __DEBUG:
+        print "L=%d" % L
         print "size of partitions"
         print len(gl_result)
         # print [len(t.member) for t in gl_result]
         print "NCP = %.2f %%" % ncp
         # pdb.set_trace()
-    return result
+    return (result, ncp)

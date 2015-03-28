@@ -7,7 +7,7 @@ from models.bucket import Bucket
 from itertools import combinations
 
 
-_DEBUG = True
+_DEBUG = False
 gl_treelist = {}
 gl_att_tree = {}
 gl_treesupport = 0
@@ -290,12 +290,12 @@ def partition(att_tree, data, K):
         if v.support == 0:
             gl_treelist[k] = [t.value for t in v.parent]
             gl_treelist[k].insert(0, k)
-    print '-' * 30
-    print "K=%d" % K
     if _DEBUG:
+        print '-' * 30
+        print "K=%d" % K
         print "Begin Partition!"
     anonymize(Bucket(range(len(gl_data)), ['*'], [0]), K)
-    print "Publishing Result Data..."
+    # print "Publishing Result Data..."
     # changed to percentage
     all_loss = 100.0 * setalliloss(gl_result)
     if _DEBUG:
@@ -304,4 +304,4 @@ def partition(att_tree, data, K):
         print "iloss = %0.2f" % all_loss + "%"
     # transform result
     result = [(t.member_index[:], t.value) for t in gl_result]
-    return result
+    return (result, all_loss)
