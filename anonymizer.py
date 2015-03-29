@@ -17,8 +17,11 @@ def get_result_one(att_trees, data, K=10, L=5):
     print "K=%d" % K
     print "L=%d" % L
     data_back = copy.deepcopy(data)
-    result, _, _ = Separation_Gen(att_trees, data, K, L)
+    result, eval_result = Separation_Gen(att_trees, data, K, L)
     data = copy.deepcopy(data_back)
+    print "RNCP %0.2f" % eval_result[0] + "%"
+    print "TNCP %0.2f" % eval_result[1] + "%"
+    print "Running time %0.2f" % eval_result[2] + "seconds"
     # save_to_file((att_trees, data, result, K, L))
 
 
@@ -27,9 +30,13 @@ def get_result_K(att_trees, data, L=5):
     print "L=%d" % L
     data_back = copy.deepcopy(data)
     for K in range(5, 55, 5):
+        print '#' * 30
         print "K=%d" % K
-        result, _, _ = Separation_Gen(att_trees, data, K, L)
+        result, eval_result = Separation_Gen(att_trees, data, K, L)
         data = copy.deepcopy(data_back)
+        print "RNCP %0.2f" % eval_result[0] + "%"
+        print "TNCP %0.2f" % eval_result[1] + "%"
+        print "Running time %0.2f" % eval_result[2] + "seconds"
         # save_to_file((att_trees, data, result, K, L))
 
 
@@ -38,9 +45,13 @@ def get_result_L(att_trees, data, K=10):
     print "K=%d" % K
     data_back = copy.deepcopy(data)
     for L in range(5, 55, 5):
+        print '#' * 30
         print "L=%d" % L
-        result, _, _ = Separation_Gen(att_trees, data, K, L)
+        result, eval_result = Separation_Gen(att_trees, data, K, L)
         data = copy.deepcopy(data_back)
+        print "RNCP %0.2f" % eval_result[0] + "%"
+        print "TNCP %0.2f" % eval_result[1] + "%"
+        print "Running time %0.2f" % eval_result[2] + "seconds"
         # save_to_file((att_trees, data, result, K, L))
 
 
@@ -56,23 +67,25 @@ def get_result_dataset(att_trees, data, K=10, L=5, n=10):
         h += 1
     for i in range(1, h + 1):
         pos = i * joint
-        srncp = stncp = 0
+        srncp = stncp = rtime = 0
         if pos > length:
             continue
+        print '#' * 30
         print "size of dataset %d" % pos
         for j in range(n):
-            rncp = tncp = 0
             temp = random.sample(data, pos)
-            result, rncp, tncp = Separation_Gen(att_trees, temp, K, L)
-            srncp += rncp
-            stncp += tncp
+            result, eval_result = Separation_Gen(att_trees, temp, K, L)
+            srncp += eval_result[0]
+            stncp += eval_result[1]
+            rtime += eval_result[2]
             data = copy.deepcopy(data_back)
             # save_to_file((att_trees, temp, result, K, L))
         srncp /= n
         stncp /= n
-        print '#' * 30
+        rtime /= n
         print "Average RNCP %0.2f" % srncp + "%"
         print "Average TNCP %0.2f" % stncp + "%"
+        print "Running time %0.2f" % rtime + "seconds"
         print '#' * 30
 
 
