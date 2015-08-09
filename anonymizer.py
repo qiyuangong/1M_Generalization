@@ -90,10 +90,10 @@ def get_result_dataset(att_trees, data, K=10, L=5, n=10):
 
 
 if __name__ == '__main__':
-    flag = ''
-    len_argv = len(sys.argv)
+    FLAG = ''
+    LEN_ARGV = len(sys.argv)
     try:
-        flag = sys.argv[1]
+        FLAG = sys.argv[1]
     except:
         pass
     # read record
@@ -103,25 +103,25 @@ if __name__ == '__main__':
     # make generalization hierarchies
     gen_gh_trees()
     # read gentree tax
-    att_trees = read_tree()
+    ATT_TREES = read_tree()
     # read record
-    data = read_data()
+    DATA = read_data()
     # Separation_Gen need only GH for transaction
-    if flag == 'k':
-        get_result_K(att_trees, data)
-    elif flag == 'l':
-        get_result_L(att_trees, data)
-    elif flag == 'data':
-        get_result_dataset(att_trees, data)
-    elif flag == 'one':
-        if len_argv > 2:
+    if FLAG == 'k':
+        get_result_K(ATT_TREES, DATA)
+    elif FLAG == 'l':
+        get_result_L(ATT_TREES, DATA)
+    elif FLAG == 'data':
+        get_result_dataset(ATT_TREES, DATA)
+    elif FLAG == 'one':
+        if LEN_ARGV > 2:
             K = int(sys.argv[2])
             L = int(sys.argv[3])
-            get_result_one(att_trees, data, K, L)
+            get_result_one(ATT_TREES, DATA, K, L)
         else:
-            get_result_one(att_trees, data)
-    elif flag == '':
-        get_result_one(att_trees, data)
+            get_result_one(ATT_TREES, DATA)
+    elif FLAG == '':
+        get_result_one(ATT_TREES, DATA)
     else:
         print "Usage: python anonymizer [k | l | data | one]"
     print "Finish 1M_Separation_Gen_KL!!"

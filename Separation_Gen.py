@@ -5,8 +5,8 @@ import pdb
 
 
 _DEBUG = False
-gl_att_trees = []
-gl_data = []
+ATT_TREES = []
+DATA = []
 
 
 def Separation_Gen(att_trees, data, K=10, L=5):
@@ -16,9 +16,9 @@ def Separation_Gen(att_trees, data, K=10, L=5):
     result is 2-dimensional list
     eval_result is a tuple (rncp, tncp, rtime)
     """
-    global gl_att_trees, gl_data
-    gl_att_trees = att_trees
-    gl_data = data
+    global ATT_TREES, DATA
+    ATT_TREES = att_trees
+    DATA = data
     start_time = time.time()
     if _DEBUG:
         print "size of dataset %d" % len(data)
@@ -29,11 +29,11 @@ def Separation_Gen(att_trees, data, K=10, L=5):
     for ttemp in trans_set:
         (index_list, tran_value) = ttemp
         for t in index_list:
-            gl_data[t][-1] = tran_value[:]
-            partition_data.append(gl_data[t][:])
+            DATA[t][-1] = tran_value[:]
+            partition_data.append(DATA[t][:])
     if _DEBUG:
         print "Begin Mondrian"
-    result, rncp = mondrian_l_diversity(gl_att_trees, partition_data, L)
+    result, rncp = mondrian_l_diversity(ATT_TREES, partition_data, L)
     rtime = float(time.time() - start_time)
     if _DEBUG:
         print "Total running time = %.2f seconds" % rtime
