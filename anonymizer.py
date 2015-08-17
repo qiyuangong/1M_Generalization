@@ -44,7 +44,7 @@ def get_result_L(att_trees, data, K=10):
     "change L, while fixing K"
     print "K=%d" % K
     data_back = copy.deepcopy(data)
-    for L in range(5, 55, 5):
+    for L in range(2, 16):
         print '#' * 30
         print "L=%d" % L
         result, eval_result = Separation_Gen(att_trees, data, K, L)
