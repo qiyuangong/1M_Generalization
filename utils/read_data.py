@@ -9,11 +9,11 @@ from utils.make_tree import pickle_static
 import pickle
 
 __DEBUG = False
-gl_useratt = ['DUID', 'PID', 'DUPERSID', 'DOBMM', 'DOBYY', 'SEX', 'RACEX', 'RACEAX', 'RACEBX', 'RACEWX', 'RACETHNX', 'HISPANX', 'HISPCAT', 'EDUCYEAR', 'Year', 'marry', 'income', 'poverty']
-gl_conditionatt = ['DUID', 'DUPERSID', 'ICD9CODX', 'year']
+USER_ATT = ['DUID', 'PID', 'DUPERSID', 'DOBMM', 'DOBYY', 'SEX', 'RACEX', 'RACEAX', 'RACEBX', 'RACEWX', 'RACETHNX', 'HISPANX', 'HISPCAT', 'EDUCYEAR', 'Year', 'marry', 'income', 'poverty']
+CONDITION_ATT = ['DUID', 'DUPERSID', 'ICD9CODX', 'year']
 # Only 5 relational attributes and 1 transaction attribute are selected (according to Poulis's paper)
-gl_attlist = [3, 4, 6, 13, 16]
-gl_if_cat = [True, True, True, True, False, True]
+QI_INDEX = [3, 4, 6, 13, 16]
+IS_CAT = [True, True, True, True, False, True]
 
 
 def read_tree(flag=0):
@@ -21,17 +21,17 @@ def read_tree(flag=0):
     """
     att_names = []
     att_trees = []
-    for t in gl_attlist:
-        att_names.append(gl_useratt[t])
+    for t in QI_INDEX:
+        att_names.append(USER_ATT[t])
     if flag:
         att_names.append('ICD9CODX')
     else:
         att_names.append('even')
     for i in range(len(att_names)):
-        if gl_if_cat[i]:
+        if IS_CAT[i]:
             att_trees.append(read_tree_file(att_names[i]))
         else:
-            att_trees.append(pickle_static(gl_attlist[i]))
+            att_trees.append(pickle_static(QI_INDEX[i]))
     return att_trees
 
 
@@ -110,8 +110,8 @@ def read_data(flag=0):
             for t in conditiondata[k]:
                 temp.add(t[2])
             hashdata[k] = []
-            for i in range(len(gl_attlist)):
-                index = gl_attlist[i]
+            for i in range(len(QI_INDEX)):
+                index = QI_INDEX[i]
                 hashdata[k].append(v[index])
             stemp = list(temp)
             # sort values

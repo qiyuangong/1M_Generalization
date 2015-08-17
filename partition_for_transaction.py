@@ -5,6 +5,7 @@ import pdb
 from models.gentree import GenTree
 from models.bucket import Bucket
 from itertools import combinations
+from utils.utility import list_to_str
 
 
 _DEBUG = False
@@ -27,16 +28,6 @@ def node_cmp(node1, node2):
         return cmp(support1, support2)
     else:
         return cmp(node1, node2)
-
-
-def list_to_str(value_list, cmpfun=node_cmp, sep=';'):
-    """covert sorted str list (sorted by cmpfun) to str
-    value (splited by sep). This fuction is value safe, which means
-    value_list will not be changed.
-    """
-    temp = value_list[:]
-    temp.sort(cmp=cmpfun)
-    return sep.join(temp)
 
 
 def information_gain(bucket, pick_value=''):
@@ -272,10 +263,7 @@ def setalliloss(buckets):
     return alliloss
 
 
-def partition(att_tree, data, K):
-    """partition tran part of microdata
-    """
-    result = []
+def init(att_tree, data, K):
     global TREE_SUPPORT, TREE_LIST, ATT_TREES, ELEMENT_COUNT, DATA, RESULT
     RESULT = []
     TREE_LIST = {}
@@ -290,6 +278,13 @@ def partition(att_tree, data, K):
         if v.support == 0:
             TREE_LIST[k] = [t.value for t in v.parent]
             TREE_LIST[k].insert(0, k)
+
+
+def partition(att_tree, data, K):
+    """partition tran part of microdata
+    """
+    init(att_tree, data, K)
+    result = []
     if _DEBUG:
         print '-' * 30
         print "K=%d" % K

@@ -5,6 +5,8 @@
 import pdb
 from models.numrange import NumRange
 from models.gentree import GenTree
+from utils.utility import cmp_str
+from utils.utility import list_to_str
 
 
 __DEBUG = False
@@ -38,42 +40,33 @@ class Partition:
             self.allow = [1] * QI_LEN
 
 
-def list_to_str(value_list, cmpfun=cmp, sep=';'):
-    """covert sorted str list (sorted by cmpfun) to str
-    value (splited by sep). This fuction is value safe, which means
-    value_list will not be changed.
-    """
-    temp = value_list[:]
-    temp.sort(cmp=cmpfun)
-    return sep.join(temp)
-
-
 def check_L_diversity(partition):
     """check if partition satisfy l-diversity
+    return True if satisfy, False if not.
     """
     sa_dict = {}
     if isinstance(partition, Partition):
-        ltemp = partition.member
+        records_set = partition.member
     else:
-        ltemp = partition
-    for temp in ltemp:
-        stemp = list_to_str(temp[-1])
+        records_set = partition
+    num_record = len(records_set)
+    for record in records_set:
+        sa_value = list_to_str(record[-1])
         try:
-            sa_dict[stemp] += 1
-        except:
-            sa_dict[stemp] = 1
-            if len(sa_dict) >= GL_L:
-                return True
-    return False
+            sa_dict[sa_value] += 1
+        except KeyError:
+            sa_dict[sa_value] = 1
+    if len(sa_dict.keys()) < GL_L:
+        return False
+    for sa in sa_dict.keys():
+        # if any SA value appear more than |T|/l,
+        # the partition does not satisfy l-diversity
+        if sa_dict[sa] > 1.0 * num_record / GL_L:
+            return False
+    return True
 
 
-def cmp_str(element1, element2):
-    """compare number in str format correctley
-    """
-    return cmp(int(element1), int(element2))
-
-
-def getNormalizedWidth(partition, index):
+def get_normalized_width(partition, index):
     """return Normalized width of partition
     similar to NCP
     """
@@ -89,7 +82,7 @@ def choose_dimension(partition):
     for i in range(QI_LEN):
         if partition.allow[i] == 0:
             continue
-        normWidth = getNormalizedWidth(partition, i)
+        normWidth = get_normalized_width(partition, i)
         if normWidth > max_witdh:
             max_witdh = normWidth
             max_dim = i
@@ -111,10 +104,11 @@ def frequency_set(partition, dim):
     return frequency
 
 
-def find_median(frequency):
+def find_median(partition, dim):
     """find the middle of the partition,
     return splitVal
     """
+    frequency = frequency_set(partition, dim)
     splitVal = ''
     value_list = frequency.keys()
     value_list.sort(cmp=cmp_str)
@@ -154,8 +148,7 @@ def anonymize(partition):
             pdb.set_trace()
         if isinstance(ATT_TREES[dim], NumRange):
             # numeric attributes
-            frequency = frequency_set(partition, dim)
-            (splitVal, split_index) = find_median(frequency)
+            (splitVal, split_index) = find_median(partition, dim)
             if splitVal == '':
                 print "Error: splitVal= null"
                 pdb.set_trace()
@@ -230,31 +223,43 @@ def anonymize(partition):
     RESULT.append(partition)
 
 
-def mondrian_l_diversity(att_trees, data, L):
+def init(att_trees, data, L):
     """
+    resset global variables
     """
     global GL_L, RESULT, QI_LEN, ATT_TREES, QI_RANGE
     ATT_TREES = att_trees
-    middle = []
     QI_LEN = len(data[0]) - 1
     GL_L = L
     RESULT = []
-    result = []
     QI_RANGE = []
+
+
+def mondrian_l_diversity(att_trees, data, L):
+    """
+    Mondrian for l-diversity.
+    This fuction support both numeric values and categoric values.
+    For numeric values, each iterator is a mean split.
+    For categoric values, each iterator is a split on GH.
+    The final result is returned in 2-dimensional list.
+    """
+    init(att_trees, data, L)
+    middle = []
+    result = []
     for i in range(QI_LEN):
         if isinstance(ATT_TREES[i], NumRange):
             QI_RANGE.append(ATT_TREES[i].range)
             middle.append(ATT_TREES[i].value)
         else:
             QI_RANGE.append(ATT_TREES[i]['*'].support)
-            middle.append(ATT_TREES[i]['*'].value)
-    partition = Partition(data, QI_RANGE[:], middle)
-    anonymize(partition)
+            middle.append('*')
+    whole_partition = Partition(data, QI_RANGE[:], middle)
+    anonymize(whole_partition)
     ncp = 0.0
     for p in RESULT:
         rncp = 0.0
         for i in range(QI_LEN):
-            rncp += getNormalizedWidth(p, i)
+            rncp += get_normalized_width(p, i)
         temp = p.middle
         for i in range(len(p.member)):
             result.append(temp[:])

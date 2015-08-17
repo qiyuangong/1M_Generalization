@@ -4,12 +4,7 @@ import string
 import math
 import pickle
 from models.numrange import NumRange
-
-
-def cmp_str(element1, element2):
-    """compare number in str format correctley
-    """
-    return cmp(int(element1), int(element2))
+from utils.utility import cmp_str
 
 
 def gen_gh_trees():

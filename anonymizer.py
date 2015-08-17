@@ -124,5 +124,5 @@ if __name__ == '__main__':
         get_result_one(ATT_TREES, DATA)
     else:
         print "Usage: python anonymizer [k | l | data | one]"
-    print "Finish 1M_Separation_Gen_KL!!"
+    print "Finish 1M_Generalization!!"
     print '*' * 30
