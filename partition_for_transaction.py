@@ -1,3 +1,6 @@
+"""
+main module of partition
+"""
 #!/usr/bin/env python
 # coding=utf-8
 
