@@ -12,10 +12,10 @@ from utils.utility import list_to_str
 
 
 _DEBUG = False
-TREE_LIST = {}
+PARENT_LIST = {}
 ATT_TREES = {}
 TREE_SUPPORT = 0
-ELEMENT_COUNT = 0
+ELEMENT_NUM = 0
 RESULT = []
 DATA = []
 
@@ -63,7 +63,7 @@ def trans_information_gain(tran, pick_value):
     ig = 0.0
     ncp = ATT_TREES[pick_value].support
     for t in tran:
-        if pick_value in TREE_LIST[t]:
+        if pick_value in PARENT_LIST[t]:
             ig += ncp
     return ig
 
@@ -123,7 +123,7 @@ def distribute_data(bucket, buckets, pick_value):
     for temp in data_index:
         gen_list = []
         for t in DATA[temp]:
-            treelist = TREE_LIST[t]
+            treelist = PARENT_LIST[t]
             try:
                 pos = treelist.index(pick_value)
                 # if covered, then replaced with new value
@@ -262,25 +262,25 @@ def setalliloss(buckets):
             gloss = gloss + iloss(DATA[mtemp], gtemp.value)
         gtemp.iloss = gloss
         alliloss += gloss
-    alliloss = alliloss * 1.0 / ELEMENT_COUNT
+    alliloss = alliloss * 1.0 / ELEMENT_NUM
     return alliloss
 
 
 def init(att_tree, data, K):
-    global TREE_SUPPORT, TREE_LIST, ATT_TREES, ELEMENT_COUNT, DATA, RESULT
+    global TREE_SUPPORT, PARENT_LIST, ATT_TREES, ELEMENT_NUM, DATA, RESULT
     RESULT = []
-    TREE_LIST = {}
-    ELEMENT_COUNT = 0
+    PARENT_LIST = {}
+    ELEMENT_NUM = 0
     TREE_SUPPORT = 0
     DATA = data[:]
     for t in DATA:
-        ELEMENT_COUNT += len(t)
+        ELEMENT_NUM += len(t)
     ATT_TREES = att_tree
     TREE_SUPPORT = ATT_TREES['*'].support
     for k, v in ATT_TREES.iteritems():
         if v.support == 0:
-            TREE_LIST[k] = [t.value for t in v.parent]
-            TREE_LIST[k].insert(0, k)
+            PARENT_LIST[k] = [t.value for t in v.parent]
+            PARENT_LIST[k].insert(0, k)
 
 
 def partition(att_tree, data, K):
