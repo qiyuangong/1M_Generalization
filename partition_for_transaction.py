@@ -14,7 +14,7 @@ from utils.utility import list_to_str
 _DEBUG = False
 PARENT_LIST = {}
 ATT_TREES = {}
-TREE_SUPPORT = 0
+LEAF_NUM = 0
 ELEMENT_NUM = 0
 RESULT = []
 DATA = []
@@ -25,8 +25,8 @@ def node_cmp(node1, node2):
     """compare node1(str) and node2(str)
     Compare two nodes accroding to their support
     """
-    support1 = ATT_TREES[node1].support
-    support2 = ATT_TREES[node2].support
+    support1 = len(ATT_TREES[node1])
+    support2 = len(ATT_TREES[node2])
     if support1 != support2:
         return cmp(support1, support2)
     else:
@@ -44,13 +44,13 @@ def information_gain(bucket, pick_value=''):
     if pick_value == '':
         # compute bucket's information gain
         for gen_value in bucket.value:
-            if ATT_TREES[gen_value].support == 0:
+            if len(ATT_TREES[gen_value]) == 0:
                 continue
             for temp in bucket.member_index:
                 ig = ig + trans_information_gain(DATA[temp], gen_value)
     else:
         # pick node's information gain
-        if ATT_TREES[pick_value].support == 0:
+        if len(ATT_TREES[pick_value]) == 0:
             return 0
         for temp in bucket.member_index:
             ig = ig + trans_information_gain(DATA[temp], pick_value)
@@ -61,7 +61,7 @@ def trans_information_gain(tran, pick_value):
     """get information gain for trans accroding to pick_value
     """
     ig = 0.0
-    ncp = ATT_TREES[pick_value].support
+    ncp = len(ATT_TREES[pick_value])
     for t in tran:
         if pick_value in PARENT_LIST[t]:
             ig += ncp
@@ -246,9 +246,9 @@ def iloss(tran, middle):
             pdb.set_trace()
         if ptemp.value == t:
             continue
-        iloss = iloss + ptemp.support
+        iloss = iloss + len(ptemp)
     # only one attribute is involved, so we can simplfy NCP
-    iloss = iloss * 1.0 / TREE_SUPPORT
+    iloss = iloss * 1.0 / LEAF_NUM
     return iloss
 
 
@@ -267,18 +267,18 @@ def setalliloss(buckets):
 
 
 def init(att_tree, data, K):
-    global TREE_SUPPORT, PARENT_LIST, ATT_TREES, ELEMENT_NUM, DATA, RESULT
+    global LEAF_NUM, PARENT_LIST, ATT_TREES, ELEMENT_NUM, DATA, RESULT
     RESULT = []
     PARENT_LIST = {}
     ELEMENT_NUM = 0
-    TREE_SUPPORT = 0
+    LEAF_NUM = 0
     DATA = data[:]
     for t in DATA:
         ELEMENT_NUM += len(t)
     ATT_TREES = att_tree
-    TREE_SUPPORT = ATT_TREES['*'].support
+    LEAF_NUM = len(ATT_TREES['*'])
     for k, v in ATT_TREES.iteritems():
-        if v.support == 0:
+        if len(v) == 0:
             PARENT_LIST[k] = [t.value for t in v.parent]
             PARENT_LIST[k].insert(0, k)
 
