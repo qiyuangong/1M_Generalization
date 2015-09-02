@@ -8,59 +8,66 @@ import random
 import sys
 import copy
 import pdb
+import cProfile
 
 # set k=10, l=5 as default!
+DEFAULT_K = 10
+DEFAULT_L = 5
 
 
-def get_result_one(att_trees, data, K=10, L=5):
-    "fix K=10, L=5"
-    print "K=%d" % K
-    print "L=%d" % L
+def get_result_one(att_trees, data, k=DEFAULT_K, l=DEFAULT_L):
+    "fix k=10, l=5"
+    print "K=%d" % k
+    print "L=%d" % l
+    print "size of dataset %d" % len(data)
     data_back = copy.deepcopy(data)
-    result, eval_result = Separation_Gen(att_trees, data, K, L)
+    result, eval_result = Separation_Gen(att_trees, data, k, l)
     data = copy.deepcopy(data_back)
     print "RNCP %0.2f" % eval_result[0] + "%"
     print "TNCP %0.2f" % eval_result[1] + "%"
     print "Running time %0.2f" % eval_result[2] + "seconds"
-    # save_to_file((att_trees, data, result, K, L))
+    # save_to_file((att_trees, data, result, k, l))
 
 
-def get_result_K(att_trees, data, L=5):
-    "change K, while fixing L"
-    print "L=%d" % L
+def get_result_k(att_trees, data, l=DEFAULT_L):
+    "change k, while fixing l"
+    print "L=%d" % l
+    print "size of dataset %d" % len(data)
     data_back = copy.deepcopy(data)
-    for K in range(5, 55, 5):
+    # for k in range(5, 55, 5):
+    for k in [2, 5, 10, 25, 50, 100]:
         print '#' * 30
-        print "K=%d" % K
-        result, eval_result = Separation_Gen(att_trees, data, K, L)
+        print "k=%d" % k
+        result, eval_result = Separation_Gen(att_trees, data, k, l)
         data = copy.deepcopy(data_back)
         print "RNCP %0.2f" % eval_result[0] + "%"
         print "TNCP %0.2f" % eval_result[1] + "%"
         print "Running time %0.2f" % eval_result[2] + "seconds"
-        # save_to_file((att_trees, data, result, K, L))
+        # save_to_file((att_trees, data, result, k, l))
 
 
-def get_result_L(att_trees, data, K=10):
-    "change L, while fixing K"
-    print "K=%d" % K
+def get_result_l(att_trees, data, k=DEFAULT_K):
+    "change l, while fixing k"
+    print "K=%d" % k
+    print "size of dataset %d" % len(data)
     data_back = copy.deepcopy(data)
-    for L in range(2, 16):
+    for l in range(2, 16):
         print '#' * 30
-        print "L=%d" % L
-        result, eval_result = Separation_Gen(att_trees, data, K, L)
+        print "l=%d" % l
+        result, eval_result = Separation_Gen(att_trees, data, k, l)
         data = copy.deepcopy(data_back)
         print "RNCP %0.2f" % eval_result[0] + "%"
         print "TNCP %0.2f" % eval_result[1] + "%"
         print "Running time %0.2f" % eval_result[2] + "seconds"
-        # save_to_file((att_trees, data, result, K, L))
+        # save_to_file((att_trees, data, result, k, l))
 
 
-def get_result_dataset(att_trees, data, K=10, L=5, n=10):
+def get_result_dataset(att_trees, data, k=DEFAULT_K, l=DEFAULT_L, n=10):
     "fix k and l, while changign dataset size"
     data_back = copy.deepcopy(data)
     length = len(data_back)
-    print "K=%d" % K
-    print "L=%d" % L
+    print "K=%d" % k
+    print "L=%d" % l
     joint = 5000
     h = length / joint
     if length % joint == 0:
@@ -74,12 +81,12 @@ def get_result_dataset(att_trees, data, K=10, L=5, n=10):
         print "size of dataset %d" % pos
         for j in range(n):
             temp = random.sample(data, pos)
-            result, eval_result = Separation_Gen(att_trees, temp, K, L)
+            result, eval_result = Separation_Gen(att_trees, temp, k, l)
             srncp += eval_result[0]
             stncp += eval_result[1]
             rtime += eval_result[2]
             data = copy.deepcopy(data_back)
-            # save_to_file((att_trees, temp, result, K, L))
+            # save_to_file((att_trees, temp, result, k, l))
         srncp /= n
         stncp /= n
         rtime /= n
@@ -91,14 +98,11 @@ def get_result_dataset(att_trees, data, K=10, L=5, n=10):
 
 if __name__ == '__main__':
     FLAG = ''
-    LEN_ARGV = len(sys.argv)
     try:
         FLAG = sys.argv[1]
     except:
         pass
     # read record
-    K = 10
-    L = 5
     print '*' * 30
     # make generalization hierarchies
     gen_gh_trees()
@@ -108,21 +112,24 @@ if __name__ == '__main__':
     DATA = read_data()
     # Separation_Gen need only GH for transaction
     if FLAG == 'k':
-        get_result_K(ATT_TREES, DATA)
+        get_result_k(ATT_TREES, DATA)
     elif FLAG == 'l':
-        get_result_L(ATT_TREES, DATA)
+        get_result_l(ATT_TREES, DATA)
     elif FLAG == 'data':
         get_result_dataset(ATT_TREES, DATA)
-    elif FLAG == 'one':
-        if LEN_ARGV > 2:
-            K = int(sys.argv[2])
-            L = int(sys.argv[3])
-            get_result_one(ATT_TREES, DATA, K, L)
-        else:
-            get_result_one(ATT_TREES, DATA)
     elif FLAG == '':
+        # cProfile.run('get_result_one(ATT_TREE, DATA, TYPE_ALG)')
         get_result_one(ATT_TREES, DATA)
     else:
-        print "Usage: python anonymizer [k | l | data | one]"
+        try:
+            INPUT_K = int(FLAG)
+            get_result_one(ATT_TREEs, DATA)
+        except ValueError:
+            print "Usage: python anonymizer [k | l | data]"
+            print "k: varying k"
+            print "l: varying l"
+            print "data: varying size of dataset"
+            print "example: python anonymizer 10"
+            print "example: python anonymizer k"
+    # anonymized dataset is stored in result
     print "Finish 1M_Generalization!!"
-    print '*' * 30

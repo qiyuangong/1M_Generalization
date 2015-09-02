@@ -9,7 +9,7 @@ ATT_TREES = []
 DATA = []
 
 
-def Separation_Gen(att_trees, data, K=10, L=5):
+def Separation_Gen(att_trees, data, k=10, l=5):
     """Using partition_for_transaction to anonymize SA (transaction) partition,
     while applying anatomy to separate QID and SA
     return (result, eval_result)
@@ -24,7 +24,7 @@ def Separation_Gen(att_trees, data, K=10, L=5):
         print "size of dataset %d" % len(data)
     result = []
     trans = [t[-1] for t in data]
-    trans_set, tncp = partition(att_trees[-1], trans, K)
+    trans_set, tncp = partition(att_trees[-1], trans, k)
     partition_data = []
     for ttemp in trans_set:
         (index_list, tran_value) = ttemp
@@ -33,7 +33,7 @@ def Separation_Gen(att_trees, data, K=10, L=5):
             partition_data.append(DATA[t][:])
     if _DEBUG:
         print "Begin Mondrian"
-    result, rncp = mondrian_l_diversity(ATT_TREES, partition_data, L)
+    result, rncp = mondrian_l_diversity(ATT_TREES, partition_data, l)
     rtime = float(time.time() - start_time)
     if _DEBUG:
         print "Total running time = %.2f seconds" % rtime
