@@ -70,6 +70,8 @@ def check_L_diversity(partition):
     return True if satisfy, False if not.
     """
     sa_dict = {}
+    if len(partition) < GL_L:
+        return False
     if isinstance(partition, Partition):
         records_set = partition.member
     else:
@@ -152,7 +154,6 @@ def find_median(partition, dim):
     total = sum(frequency.values())
     middle = total / 2
     if middle < GL_L:
-        print "Error: size of group less than 2*L"
         return '', ''
     index = 0
     split_index = 0
@@ -199,9 +200,9 @@ def anonymize(partition):
     Main procedure of mondrian_l_diversity.
     recursively partition groups until not allowable.
     """
-    if len(partition) < GL_L * 2:
-        RESULT.append(partition)
-        return
+    # if len(partition) < GL_L * 2:
+    #     RESULT.append(partition)
+    #     return
     allow_count = sum(partition.allow)
     pwidth = partition.width
     pmiddle = partition.middle
@@ -214,8 +215,8 @@ def anonymize(partition):
             # numeric attributes
             (splitVal, nextVal) = find_median(partition, dim)
             if splitVal == '':
-                print "Error: splitVal= null"
-                pdb.set_trace()
+                partition.allow[dim] = 0
+                continue
             middle_pos = ATT_TREES[dim].dict[splitVal]
             lhs_middle = pmiddle[:]
             rhs_middle = pmiddle[:]
@@ -333,8 +334,8 @@ def mondrian_l_diversity(att_trees, data, L):
         dp += len(partition) ** 2
         for i in range(QI_LEN):
             rncp += get_normalized_width(partition, i)
-        gen_result = partition.middle
         for i in range(len(partition)):
+            gen_result = partition.middle + [partition.member[i][-1]]
             result.append(gen_result[:])
         rncp *= len(partition)
         ncp += rncp

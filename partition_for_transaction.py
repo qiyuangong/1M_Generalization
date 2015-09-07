@@ -204,9 +204,6 @@ def balance_partitions(parent_bucket, buckets, K, pick_value):
 def check_splitable(bucket, K):
     """check if bucket can further drill down
     """
-    if len(bucket.member_index) == K:
-        bucket.splitable = False
-        return False
     check_list = [t for t in bucket.value if t not in bucket.split_list]
     if bucket.splitable:
         for t in check_list:
