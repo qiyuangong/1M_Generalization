@@ -3,13 +3,14 @@
 from Separation_Gen import Separation_Gen
 from utils.make_tree import gen_gh_trees
 from utils.read_data import read_data, read_tree
-from utils.save_result import save_to_file
 import random
 import sys
 import copy
 import pdb
 import cProfile
 
+
+__DEBUG = False
 # set k=10, l=5 as default!
 DEFAULT_K = 10
 DEFAULT_L = 5
@@ -23,8 +24,8 @@ def get_result_one(att_trees, data, k=DEFAULT_K, l=DEFAULT_L):
     data_back = copy.deepcopy(data)
     result, eval_result = Separation_Gen(att_trees, data, k, l)
     data = copy.deepcopy(data_back)
-    print "RNCP %0.2f" % eval_result[0] + "%"
-    print "TNCP %0.2f" % eval_result[1] + "%"
+    print "QID-NCP %0.2f" % eval_result[0] + "%"
+    print "SA-NCP %0.2f" % eval_result[1] + "%"
     print "Running time %0.2f" % eval_result[2] + "seconds"
     # save_to_file((att_trees, data, result, k, l))
 
@@ -40,8 +41,8 @@ def get_result_k(att_trees, data, l=DEFAULT_L):
         print "k=%d" % k
         result, eval_result = Separation_Gen(att_trees, data, k, l)
         data = copy.deepcopy(data_back)
-        print "RNCP %0.2f" % eval_result[0] + "%"
-        print "TNCP %0.2f" % eval_result[1] + "%"
+        print "QID-NCP %0.2f" % eval_result[0] + "%"
+        print "SA-NCP %0.2f" % eval_result[1] + "%"
         print "Running time %0.2f" % eval_result[2] + "seconds"
         # save_to_file((att_trees, data, result, k, l))
 
@@ -56,8 +57,8 @@ def get_result_l(att_trees, data, k=DEFAULT_K):
         print "l=%d" % l
         result, eval_result = Separation_Gen(att_trees, data, k, l)
         data = copy.deepcopy(data_back)
-        print "RNCP %0.2f" % eval_result[0] + "%"
-        print "TNCP %0.2f" % eval_result[1] + "%"
+        print "QID-NCP %0.2f" % eval_result[0] + "%"
+        print "SA-NCP %0.2f" % eval_result[1] + "%"
         print "Running time %0.2f" % eval_result[2] + "seconds"
         # save_to_file((att_trees, data, result, k, l))
 
@@ -74,7 +75,7 @@ def get_result_dataset(att_trees, data, k=DEFAULT_K, l=DEFAULT_L, n=10):
         h += 1
     for i in range(1, h + 1):
         pos = i * joint
-        srncp = stncp = rtime = 0
+        all_qid_ncp = all_sa_ncp = all_rtime = 0
         if pos > length:
             continue
         print '#' * 30
@@ -82,17 +83,17 @@ def get_result_dataset(att_trees, data, k=DEFAULT_K, l=DEFAULT_L, n=10):
         for j in range(n):
             temp = random.sample(data, pos)
             result, eval_result = Separation_Gen(att_trees, temp, k, l)
-            srncp += eval_result[0]
-            stncp += eval_result[1]
-            rtime += eval_result[2]
+            all_qid_ncp += eval_result[0]
+            all_sa_ncp += eval_result[1]
+            all_rtime += eval_result[2]
             data = copy.deepcopy(data_back)
             # save_to_file((att_trees, temp, result, k, l))
-        srncp /= n
-        stncp /= n
-        rtime /= n
-        print "Average RNCP %0.2f" % srncp + "%"
-        print "Average TNCP %0.2f" % stncp + "%"
-        print "Running time %0.2f" % rtime + "seconds"
+        all_qid_ncp /= n
+        all_sa_ncp /= n
+        all_rtime /= n
+        print "Average QID-NCP %0.2f" % all_qid_ncp + "%"
+        print "Average SA-NCP %0.2f" % all_sa_ncp + "%"
+        print "Running time %0.2f" % all_rtime + "seconds"
         print '#' * 30
 
 
@@ -118,12 +119,17 @@ if __name__ == '__main__':
     elif FLAG == 'data':
         get_result_dataset(ATT_TREES, DATA)
     elif FLAG == '':
-        # cProfile.run('get_result_one(ATT_TREE, DATA, TYPE_ALG)')
-        get_result_one(ATT_TREES, DATA)
+        if __DEBUG:
+            cProfile.run('get_result_one(ATT_TREE, DATA)')
+        else:
+            get_result_one(ATT_TREES, DATA)
     else:
         try:
             INPUT_K = int(FLAG)
-            get_result_one(ATT_TREEs, DATA)
+            if __DEBUG:
+                cProfile.run('get_result_one(ATT_TREE, DATA, INPUT_K)')
+            else:
+                get_result_one(ATT_TREES, DATA, INPUT_K)
         except ValueError:
             print "Usage: python anonymizer [k | l | data]"
             print "k: varying k"

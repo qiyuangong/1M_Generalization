@@ -85,6 +85,7 @@ def read_data(flag=0):
         row = line.split(',')
         row[2] = row[2][1:-1]
         try:
+            # append duplicate records
             userdata[row[2]].append(row)
         except:
             userdata[row[2]] = row
