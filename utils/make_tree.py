@@ -6,6 +6,7 @@ import pickle
 from models.numrange import NumRange
 from utils.utility import cmp_str
 
+__DEBUG = False
 
 def gen_gh_trees():
     """gen all tress from treeseed file or static
@@ -22,7 +23,8 @@ def gen_even_tree(fanout):
     """
     try:
         treefile = open('data/treefile_even.txt', 'rU')
-        print "ICD09 even tree exists"
+        if __DEBUG:
+            print "ICD09 even tree exists"
     except:
         treeseed = open('data/treeseed_even.txt', 'rU')
         treefile = open('data/treefile_even.txt', 'w')
@@ -80,7 +82,8 @@ def gen_DOBYY_tree():
     "We define a birth year tree with min = 1900 and max = 2010, and coverage splited by 5, 10, 50 year"
     try:
         treefile = open('data/treefile_DOBYY.txt', 'rU')
-        print "DOBYY tree exists"
+        if __DEBUG:
+            print "DOBYY tree exists"
     except:
         treefile = open('data/treefile_DOBYY.txt', 'w')
         for i in range(1900, 2011):
@@ -117,7 +120,8 @@ def gen_even_income_tree(fanout):
     static_value = []
     try:
         income_tree = open('data/treefile_income.txt', 'rU')
-        print "even income tree exists"
+        if __DEBUG:
+            print "even income tree exists"
     except:
         income_tree = open('data/treefile_income.txt', 'w')
         try:

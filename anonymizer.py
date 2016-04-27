@@ -27,7 +27,6 @@ def get_result_one(att_trees, data, k=DEFAULT_K, l=DEFAULT_L):
     print "QID-NCP %0.2f" % eval_result[0] + "%"
     print "SA-NCP %0.2f" % eval_result[1] + "%"
     print "Running time %0.2f" % eval_result[2] + "seconds"
-    # save_to_file((att_trees, data, result, k, l))
 
 
 def get_result_k(att_trees, data, l=DEFAULT_L):
@@ -35,8 +34,12 @@ def get_result_k(att_trees, data, l=DEFAULT_L):
     print "L=%d" % l
     print "size of dataset %d" % len(data)
     data_back = copy.deepcopy(data)
-    # for k in range(5, 55, 5):
-    for k in [2, 5, 10, 25, 50, 100]:
+    all_qid_ncp = []
+    all_sa_ncp = []
+    all_rtime = []
+    # k_range = range(5, 55, 5):
+    k_range = [2, 5, 10, 25, 50, 100]
+    for k in k_range:
         print '#' * 30
         print "k=%d" % k
         result, eval_result = Separation_Gen(att_trees, data, k, l)
@@ -44,7 +47,14 @@ def get_result_k(att_trees, data, l=DEFAULT_L):
         print "QID-NCP %0.2f" % eval_result[0] + "%"
         print "SA-NCP %0.2f" % eval_result[1] + "%"
         print "Running time %0.2f" % eval_result[2] + "seconds"
-        # save_to_file((att_trees, data, result, k, l))
+        all_qid_ncp.append(round(eval_result[0], 2))
+        all_sa_ncp.append(round(eval_result[1], 2))
+        all_rtime.append(round(eval_result[2], 2))
+    print '#' * 30
+    print "K range", k_range
+    print "All QID-NCP", all_qid_ncp
+    print "All SA-NCP", all_sa_ncp
+    print "All Running time", all_rtime
 
 
 def get_result_l(att_trees, data, k=DEFAULT_K):
@@ -52,7 +62,11 @@ def get_result_l(att_trees, data, k=DEFAULT_K):
     print "K=%d" % k
     print "size of dataset %d" % len(data)
     data_back = copy.deepcopy(data)
-    for l in range(2, 16):
+    all_qid_ncp = []
+    all_sa_ncp = []
+    all_rtime = []
+    l_range = range(2 , 16)
+    for l in l_range:
         print '#' * 30
         print "l=%d" % l
         result, eval_result = Separation_Gen(att_trees, data, k, l)
@@ -60,7 +74,14 @@ def get_result_l(att_trees, data, k=DEFAULT_K):
         print "QID-NCP %0.2f" % eval_result[0] + "%"
         print "SA-NCP %0.2f" % eval_result[1] + "%"
         print "Running time %0.2f" % eval_result[2] + "seconds"
-        # save_to_file((att_trees, data, result, k, l))
+        all_qid_ncp.append(round(eval_result[0], 2))
+        all_sa_ncp.append(round(eval_result[1], 2))
+        all_rtime.append(round(eval_result[2], 2))
+    print '#' * 30
+    print "L range", l_range
+    print "All QID-NCP", all_qid_ncp
+    print "All SA-NCP", all_sa_ncp
+    print "All Running time", all_rtime
 
 
 def get_result_dataset(att_trees, data, k=DEFAULT_K, l=DEFAULT_L, n=10):
@@ -70,31 +91,42 @@ def get_result_dataset(att_trees, data, k=DEFAULT_K, l=DEFAULT_L, n=10):
     print "K=%d" % k
     print "L=%d" % l
     joint = 5000
-    h = length / joint
+    datasets = []
+    check_time = length / joint
     if length % joint == 0:
-        h += 1
-    for i in range(1, h + 1):
-        pos = i * joint
-        all_qid_ncp = all_sa_ncp = all_rtime = 0
-        if pos > length:
-            continue
+        check_time -= 1
+    for i in range(check_time):
+        datasets.append(joint * (i + 1))
+    # datasets.append(length)
+    all_qid_ncp = []
+    all_sa_ncp = []
+    all_rtime = []
+    for pos in datasets:
+        qid_ncp = sa_ncp = rtime = 0
         print '#' * 30
         print "size of dataset %d" % pos
         for j in range(n):
             temp = random.sample(data, pos)
             result, eval_result = Separation_Gen(att_trees, temp, k, l)
-            all_qid_ncp += eval_result[0]
-            all_sa_ncp += eval_result[1]
-            all_rtime += eval_result[2]
+            qid_ncp += eval_result[0]
+            sa_ncp += eval_result[1]
+            rtime += eval_result[2]
             data = copy.deepcopy(data_back)
-            # save_to_file((att_trees, temp, result, k, l))
-        all_qid_ncp /= n
-        all_sa_ncp /= n
-        all_rtime /= n
-        print "Average QID-NCP %0.2f" % all_qid_ncp + "%"
-        print "Average SA-NCP %0.2f" % all_sa_ncp + "%"
-        print "Running time %0.2f" % all_rtime + "seconds"
-        print '#' * 30
+        qid_ncp /= n
+        sa_ncp /= n
+        rtime /= n
+        all_qid_ncp.append(round(qid_ncp, 2))
+        all_sa_ncp.append(round(sa_ncp, 2))
+        all_rtime.append(round(rtime, 2))
+        print "Average QID-NCP %0.2f" % qid_ncp + "%"
+        print "Average SA-NCP %0.2f" % sa_ncp + "%"
+        print "Running time %0.2f" % rtime + "seconds"
+    print '#' * 30
+    print "Size of datasets", datasets
+    print "All QID-NCP", all_qid_ncp
+    print "All SA-NCP", all_sa_ncp
+    print "All Running time", all_rtime
+
 
 
 if __name__ == '__main__':
