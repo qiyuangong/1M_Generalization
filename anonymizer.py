@@ -29,6 +29,38 @@ def get_result_one(att_trees, data, k=DEFAULT_K, l=DEFAULT_L):
     print "Running time %0.2f" % eval_result[2] + "seconds"
 
 
+def get_result_kl(att_trees, data):
+    "change k and l, while fixing dataset"
+    print "size of dataset %d" % len(data)
+    data_back = copy.deepcopy(data)
+    all_qid_ncp = []
+    all_sa_ncp = []
+    all_rtime = []
+    # k_range = range(5, 55, 5):
+    k_range = [2, 5, 10, 25, 50, 100]
+    l_range = range(2 , 16)
+    for k in k_range:
+        print '#' * 30
+        for l in l_range:
+            print '#' * 10
+            print "k=%d" % k
+            print "l=%d" % l
+            result, eval_result = Separation_Gen(att_trees, data, k, l)
+            data = copy.deepcopy(data_back)
+            print "QID-NCP %0.2f" % eval_result[0] + "%"
+            print "SA-NCP %0.2f" % eval_result[1] + "%"
+            print "Running time %0.2f" % eval_result[2] + "seconds"
+            all_qid_ncp.append(round(eval_result[0], 2))
+            all_sa_ncp.append(round(eval_result[1], 2))
+            all_rtime.append(round(eval_result[2], 2))
+    print '#' * 30
+    print "K range", k_range
+    print "L range", l_range
+    print "All QID-NCP", all_qid_ncp
+    print "All SA-NCP", all_sa_ncp
+    print "All Running time", all_rtime
+
+
 def get_result_k(att_trees, data, l=DEFAULT_L):
     "change k, while fixing l"
     print "L=%d" % l
@@ -150,6 +182,8 @@ if __name__ == '__main__':
         get_result_l(ATT_TREES, DATA)
     elif FLAG == 'data':
         get_result_dataset(ATT_TREES, DATA)
+    elif FLAG == 'kl':
+        get_result_kl(ATT_TREES, DATA)
     elif FLAG == '':
         if __DEBUG:
             cProfile.run('get_result_one(ATT_TREE, DATA)')
