@@ -23,7 +23,9 @@ def Separation_Gen(att_trees, data, k=10, l=5):
     if _DEBUG:
         print "size of dataset %d" % len(data)
     result = []
+    # copy transaction part of data to trans
     trans = [t[-1] for t in data]
+    # anonymize transaction part with partition algorithm
     trans_set, sa_ncp = partition(att_trees[-1], trans, k)
     partition_data = []
     for ttemp in trans_set:
@@ -33,6 +35,7 @@ def Separation_Gen(att_trees, data, k=10, l=5):
             partition_data.append(DATA[t][:])
     if _DEBUG:
         print "Begin Mondrian"
+    # anonymize qid and sa part with mondrian_l_diversity
     result, qid_ncp = mondrian_l_diversity(ATT_TREES, partition_data, l)
     rtime = float(time.time() - start_time)
     if _DEBUG:

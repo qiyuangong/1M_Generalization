@@ -24,8 +24,10 @@ def read_tree(flag=0):
     for t in QI_INDEX:
         att_names.append(USER_ATT[t])
     if flag:
+        # ICD9 gh
         att_names.append('ICD9CODX')
     else:
+        # even gh
         att_names.append('even')
     for i in range(len(att_names)):
         if IS_CAT[i]:
