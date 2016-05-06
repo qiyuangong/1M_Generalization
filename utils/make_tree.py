@@ -12,8 +12,60 @@ def gen_gh_trees():
     """gen all tress from treeseed file or static
     """
     gen_even_tree(5)
+    gen_ICD9_tree()
     gen_even_income_tree(5)
     gen_DOBYY_tree()
+
+
+def gen_ICD9_tree():
+    "disease tree is more complex, so we need treeseed to simplify definition"
+    try:
+        treefile = open('data/informs_ICD9.txt', 'rU')
+        if __DEBUG:
+            print "ICD09 full tree exists"
+    except:
+        if __DEBUG:
+            print "generate ICD09 full tree"
+        treeseed = open('data/informs_treeseed_ICD9.txt', 'rU')
+        treefile = open('data/informs_ICD9.txt', 'w')
+        for line in treeseed:
+            # get low bound tree leaf
+            title = ''
+            temp = line.split(';')
+            #separate special value
+            if temp[0][0] != 'E' and temp[0][0] != 'V':
+                now = string.atoi(temp[0])
+                bottom = string.atoi(temp[1].split(',')[0])
+                top = string.atoi(temp[1].split(',')[1])
+                if now > bottom:
+                    treefile.write(line)
+                    continue
+                index = line.find(';')
+                while bottom <= top:
+                    stemp = str(bottom)
+                    if bottom < 100 and bottom >= 0:
+                        stemp = '0' + stemp
+                    if bottom < 10 and bottom >= 0:
+                        stemp = '0' + stemp
+                    treefile.write(stemp + line[index:])
+                    bottom = bottom + 1
+            else:
+                title = temp[0][0]
+                now = string.atoi(temp[0][1:])
+                bottom = string.atoi(temp[1].split(',')[0][1:])
+                top = string.atoi(temp[1].split(',')[1][1:])
+                if now > bottom:
+                    treefile.write(line)
+                    continue
+                index = line.find(';')
+                while bottom <= top:
+                    stemp = str(bottom)
+                    if bottom < 10:
+                        stemp = '0' + stemp
+                    treefile.write(title + stemp + line[index:])
+                    bottom = bottom + 1
+        treeseed.close()
+        treefile.close()
 
 
 # generate tree from treeseed
@@ -22,12 +74,14 @@ def gen_even_tree(fanout):
     For large dataset fanout = 5, for small dataset fanout = 4
     """
     try:
-        treefile = open('data/treefile_even.txt', 'rU')
+        treefile = open('data/informs_even.txt', 'rU')
         if __DEBUG:
             print "ICD09 even tree exists"
     except:
-        treeseed = open('data/treeseed_even.txt', 'rU')
-        treefile = open('data/treefile_even.txt', 'w')
+        if __DEBUG:
+            print "generate ICD09 even tree"
+        treeseed = open('data/informs_treeseed_even.txt', 'rU')
+        treefile = open('data/informs_even.txt', 'w')
         for line in treeseed:
             line = line.strip()
             temp = line.split(',')
@@ -81,11 +135,13 @@ def gen_even_tree(fanout):
 def gen_DOBYY_tree():
     "We define a birth year tree with min = 1900 and max = 2010, and coverage splited by 5, 10, 50 year"
     try:
-        treefile = open('data/treefile_DOBYY.txt', 'rU')
+        treefile = open('data/informs_DOBYY.txt', 'rU')
         if __DEBUG:
             print "DOBYY tree exists"
     except:
-        treefile = open('data/treefile_DOBYY.txt', 'w')
+        if __DEBUG:
+            print "generate DOBYY tree"
+        treefile = open('data/informs_DOBYY.txt', 'w')
         for i in range(1900, 2011):
             i1 = i / 5
             i2 = i / 10
@@ -99,7 +155,7 @@ def gen_DOBYY_tree():
 
 # def gen_income_tree():
 #     "We split this tree by i,100,1000,10000,*(5 layers) min = -40 000, max = 200 000"
-#     treefile = open('data/treefile_income.txt','w')
+#     treefile = open('data/informs_income.txt','w')
 #     for i in range(-40000, 220001):
 #         i0 = i / 10
 #         i1 = i / 100
@@ -119,13 +175,15 @@ def gen_even_income_tree(fanout):
     need_static = False
     static_value = []
     try:
-        income_tree = open('data/treefile_income.txt', 'rU')
+        income_tree = open('data/informs_income.txt', 'rU')
         if __DEBUG:
             print "even income tree exists"
     except:
-        income_tree = open('data/treefile_income.txt', 'w')
+        if __DEBUG:
+            print "generate income tree"
+        income_tree = open('data/informs_income.txt', 'w')
         try:
-            static_file = open('data/income_Static_value.pickle', 'rb')
+            static_file = open('data/informs_income_Static_value.pickle', 'rb')
             pickled = pickle.load(static_file)
             static_file.close()
         except:
@@ -159,12 +217,12 @@ def pickle_static(index):
     need_static = False
     support = {}
     try:
-        static_file = open('data/income_Static_value.pickle', 'rb')
+        static_file = open('data/informs_income_Static_value.pickle', 'rb')
         # print "Income pickle Data exist..."
         result = pickle.load(static_file)
     except:
         need_static = True
-        static_file = open('data/income_Static_value.pickle', 'wb')
+        static_file = open('data/informs_income_Static_value.pickle', 'wb')
         print "Pickle Data..."
         for i, line in enumerate(userfile):
             line = line.strip()

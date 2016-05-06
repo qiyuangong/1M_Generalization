@@ -25,7 +25,7 @@ def read_tree(flag=0):
         att_names.append(USER_ATT[t])
     if flag:
         # ICD9 gh
-        att_names.append('ICD9CODX')
+        att_names.append('ICD9')
     else:
         # even gh
         att_names.append('even')
@@ -42,7 +42,7 @@ def read_tree_file(treename):
     """
     leaf_to_path = {}
     att_tree = {}
-    prefix = 'data/treefile_'
+    prefix = 'data/informs_'
     postfix = ".txt"
     treefile = open(prefix + treename + postfix, 'rU')
     att_tree['*'] = GenTree('*')
