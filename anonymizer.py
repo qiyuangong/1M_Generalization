@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 from Separation_Gen import Separation_Gen
-from utils.make_tree import gen_gh_trees
+from utils.make_tree import gen_informs_gh_trees
 from utils.read_informs_data import read_data as read_informs
 from utils.read_informs_data import read_tree as read_informs_tree
 from utils.read_youtube_data import read_data as read_youtube
@@ -175,7 +175,7 @@ if __name__ == '__main__':
     # read record
     print '*' * 30
     # make generalization hierarchies
-    gen_gh_trees()
+    gen_informs_gh_trees()
     # read dataset
     if DATA_SELECT == 'i':
         print "INFORMS data"

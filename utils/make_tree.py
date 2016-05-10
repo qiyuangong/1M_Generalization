@@ -8,16 +8,16 @@ from utils.utility import cmp_str
 
 __DEBUG = False
 
-def gen_gh_trees():
+def gen_informs_gh_trees():
     """gen all tress from treeseed file or static
     """
-    gen_even_tree(5)
-    gen_ICD9_tree()
-    gen_even_income_tree(5)
-    gen_DOBYY_tree()
+    gen_informs_even_tree(5)
+    gen_informs_ICD9_tree()
+    # gen_informs_even_income_tree(5)
+    gen_informs_DOBYY_tree()
 
 
-def gen_ICD9_tree():
+def gen_informs_ICD9_tree():
     "disease tree is more complex, so we need treeseed to simplify definition"
     try:
         treefile = open('data/informs_ICD9.txt', 'rU')
@@ -69,7 +69,7 @@ def gen_ICD9_tree():
 
 
 # generate tree from treeseed
-def gen_even_tree(fanout):
+def gen_informs_even_tree(fanout):
     """This generalization hierarchy is defined according to even fan-out (average distribution).
     For large dataset fanout = 5, for small dataset fanout = 4
     """
@@ -132,7 +132,7 @@ def gen_even_tree(fanout):
     treefile.close()
 
 
-def gen_DOBYY_tree():
+def gen_informs_DOBYY_tree():
     "We define a birth year tree with min = 1900 and max = 2010, and coverage splited by 5, 10, 50 year"
     try:
         treefile = open('data/informs_DOBYY.txt', 'rU')
@@ -168,7 +168,7 @@ def gen_DOBYY_tree():
 #     return
 # even fan out create a tree with less node. making the algorithm more effective
 # meanwhile, generalization tree create by 10*n maybe more semantic
-def gen_even_income_tree(fanout):
+def gen_informs_even_income_tree(fanout):
     """This generalization hierarchy for BMS-WebView-2.dat is defined according to even fan-out (average distribution).
     For large dataset fanout = 5, for small dataset fanout = 4
     """

@@ -13,7 +13,10 @@ USER_ATT = ['DUID', 'PID', 'DUPERSID', 'DOBMM', 'DOBYY', 'SEX', 'RACEX', 'RACEAX
 CONDITION_ATT = ['DUID', 'DUPERSID', 'ICD9CODX', 'year']
 # Only 5 relational attributes and 1 transaction attribute are selected (according to Poulis's paper)
 QI_INDEX = [3, 4, 6, 13, 16]
-IS_CAT = [True, True, True, True, False, True]
+# if you want to achieve better utility, you can set some numeric attribute
+# to be False. Then the program will treat it as a numeric attributes
+# and generate range values without generalization hierarchy
+IS_CAT = [True, True, True, True, True, True]
 
 
 def read_tree(flag=0):
