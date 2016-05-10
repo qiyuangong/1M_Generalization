@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 from Separation_Gen import Separation_Gen
-from utils.make_tree import gen_informs_gh_trees
+from utils.make_tree import gen_gh_trees
 from utils.read_informs_data import read_data as read_informs
 from utils.read_informs_data import read_tree as read_informs_tree
 from utils.read_youtube_data import read_data as read_youtube
@@ -167,27 +167,28 @@ def get_result_dataset(att_trees, data, k=DEFAULT_K, l=DEFAULT_L, n=10):
 if __name__ == '__main__':
     FLAG = ''
     try:
-        # print sys.argv
+        print sys.argv
         DATA_SELECT = sys.argv[1]
         FLAG = sys.argv[2]
     except:
         DATA_SELECT = 'i'
     # read record
     print '*' * 30
-    # make generalization hierarchies
-    gen_informs_gh_trees()
     # read dataset
     if DATA_SELECT == 'i':
         print "INFORMS data"
         DATA = read_informs()
+        # gen_gh_trees(DATA_SELECT)
         ATT_TREES = read_informs_tree()
     elif DATA_SELECT == 'y':
         print "Youtube data"
         DATA = read_youtube()
+        # gen_gh_trees(DATA_SELECT)
         ATT_TREES = read_youtube_tree()
     else:
         print "INFORMS data"
         DATA = read_informs()
+        # gen_gh_trees(DATA_SELECT)
         ATT_TREES = read_informs_tree()
     # Separation_Gen need only GH for transaction
     if FLAG == 'k':

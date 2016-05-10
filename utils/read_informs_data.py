@@ -5,8 +5,8 @@
 # user att ['DUID','PID','DUPERSID','DOBMM','DOBYY','SEX','RACEX','RACEAX','RACEBX','RACEWX','RACETHNX','HISPANX','HISPCAT','EDUCYEAR','Year','marry','income','poverty']
 # condition att ['DUID','DUPERSID','ICD9CODX','year']
 from models.gentree import GenTree
-from utils.make_tree import pickle_static
 import pickle
+from models.numrange import NumRange
 
 __DEBUG = False
 USER_ATT = ['DUID', 'PID', 'DUPERSID', 'DOBMM', 'DOBYY', 'SEX', 'RACEX', 'RACEAX', 'RACEBX', 'RACEWX', 'RACETHNX', 'HISPANX', 'HISPCAT', 'EDUCYEAR', 'Year', 'marry', 'income', 'poverty']
@@ -36,8 +36,19 @@ def read_tree(flag=0):
         if IS_CAT[i]:
             att_trees.append(read_tree_file(att_names[i]))
         else:
-            att_trees.append(pickle_static(QI_INDEX[i]))
+            att_trees.append(read_pickle_file(att_names[i]))
     return att_trees
+
+
+def read_pickle_file(att_name):
+    """
+    read pickle file for numeric attributes
+    return numrange object
+    """
+    with open('data/informs_' + att_name + '_static.pickle', 'rb') as static_file:
+        (numeric_dict, sort_value) = pickle.load(static_file)
+        result = NumRange(sort_value, numeric_dict)
+        return result
 
 
 def read_tree_file(treename):

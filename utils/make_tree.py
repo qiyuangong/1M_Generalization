@@ -8,13 +8,42 @@ from utils.utility import cmp_str
 
 __DEBUG = False
 
-def gen_informs_gh_trees():
+def gen_gh_trees(data_select):
     """gen all tress from treeseed file or static
     """
-    gen_informs_even_tree(5)
-    gen_informs_ICD9_tree()
-    # gen_informs_even_income_tree(5)
-    gen_informs_DOBYY_tree()
+    if data_select == 'i':
+        gen_informs_even_tree(5)
+        gen_informs_ICD9_tree()
+        # gen_informs_even_income_tree(5)
+        gen_informs_DOBYY_tree()
+    else:
+        gen_youtube_trees(5)
+
+
+def gen_youtube_trees(fanout=5):
+    qi_names = ['age', 'length',
+             'views', 'rate', 'ratings', 'comments']
+    for att_name in qi_names:
+        with open('data/youtube_' + att_name + '_static.pickle', 'rb') as static_file:
+            gh_tree = open('data/youtube_' + att_name + '.txt', 'w')
+            (__, sort_value) = pickle.load(static_file)
+            height = int(math.ceil(math.log(len(sort_value), fanout)))
+            for i, temp in enumerate(sort_value):
+                node = []
+                for h in range(height):
+                    if h == 0:
+                        temp = '%s' % sort_value[i]
+                    else:
+                        window = fanout ** h
+                        times = i / window
+                        bottom = times * window
+                        top = (times + 1) * window - 1
+                        if top >= len(sort_value):
+                            top = len(sort_value) - 1
+                        temp = '%s,%s' % (sort_value[bottom], sort_value[top])
+                    node.append(temp)
+                node.append('*')
+                gh_tree.write(';'.join(node) + '\n')
 
 
 def gen_informs_ICD9_tree():
@@ -188,7 +217,7 @@ def gen_informs_even_income_tree(fanout):
             static_file.close()
         except:
             # index of income is 16
-            pickled = pickle_static(16)
+            pickled = pickle_static_income(16)
         static_value = pickled.sort_value
         height = int(math.ceil(math.log(len(static_value), fanout)))
         for i, temp in enumerate(static_value):
@@ -210,7 +239,7 @@ def gen_informs_even_income_tree(fanout):
     income_tree.close()
 
 
-def pickle_static(index):
+def pickle_static_income(index):
     """pickle sorted values of datasets
     """
     userfile = open('data/demographics.csv', 'rU')
