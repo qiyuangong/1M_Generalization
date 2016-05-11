@@ -22,7 +22,7 @@ def gen_gh_trees(data_select):
 
 def gen_youtube_trees(fanout=5):
     qi_names = ['age', 'length',
-             'views', 'rate', 'ratings', 'comments']
+             'views', 'rate', 'ratings', 'comments', 'related_ID']
     for att_name in qi_names:
         with open('data/youtube_' + att_name + '_static.pickle', 'rb') as static_file:
             gh_tree = open('data/youtube_' + att_name + '.txt', 'w')

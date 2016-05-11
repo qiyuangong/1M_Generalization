@@ -2,6 +2,7 @@
 # coding=utf-8
 
 import pickle
+import os.path
 from utils.utility import cmp_str
 from make_tree import pickle_static_income
 from models.gentree import GenTree
@@ -10,9 +11,9 @@ import pdb
 
 __DEBUG = False
 ATT_NAMES = ['video_ID', 'uploader', 'age', 'category', 'length',
-             'views', 'rate', 'ratings', 'comments', 'related_ID']
+             'views', 'rate', 'ratings', 'comments', '']
 QI_INDEX = [2, 3, 4, 5, 6, 7, 8]
-IS_CAT = [False, True, True, True, True, True, True, True]
+IS_CAT = [True, True, True, True, True, True, True, True]
 SA_INDEX = 9
 
 def read_data():
@@ -22,6 +23,8 @@ def read_data():
     QI_num = len(QI_INDEX)
     data = []
     numeric_dict = []
+    sa_index = 0
+    sa_dict = {}
     for i in range(QI_num):
         numeric_dict.append(dict())
     # oder categorical attributes in intuitive order
@@ -39,6 +42,8 @@ def read_data():
         if len(temp) < 9:
             # remove line only have single id
             continue
+        sa_dict[temp[0]] = str(sa_index)
+        sa_index += 1
         for i in range(QI_num):
             index = QI_INDEX[i]
             if IS_CAT[i] is False:
@@ -47,8 +52,8 @@ def read_data():
                 except KeyError:
                     numeric_dict[i][temp[index]] = 1
             ltemp.append(temp[index])
-        # add all related id as a list
-        ltemp.append(temp[9:])
+        # add first 10 related id as a list
+        ltemp.append(temp[9:][:10])
         data.append(ltemp)
     # pickle numeric attributes
     for i in range(QI_num):
@@ -58,7 +63,36 @@ def read_data():
             sort_value.sort(cmp=cmp_str)
             pickle.dump((numeric_dict[i], sort_value), static_file)
             static_file.close()
-    return data
+    final_data = []
+    for record in data:
+        related_id = record[7]
+        temp = []
+        for v_id in related_id:
+            try:
+                temp.append(sa_dict[v_id])
+            except KeyError:
+                # ignore videos that are not in datasets
+                # temp.append(sa_index)
+                # sa_dict[v_id] = str(sa_index)
+                # sa_index += 1
+                pass
+        if len(temp) > 0:
+            # remove records with empty related id
+            record[7] = temp
+            final_data.append(record)
+    # pickle sa
+    if os.path.isfile('youtube_related_ID_static.pickle') is True:
+        with open('data/youtube_related_ID_static.pickle', 'wb') as static_file:
+            sort_value = list(sa_dict.values())
+            sort_value.sort(cmp=cmp_str)
+            pickle.dump((sa_dict, sort_value), static_file)
+            static_file.close()
+            with open('data/youtube_related_ID_to_num.txt', 'w') as related_num:
+                temp = sa_dict.items()
+                temp.sort(key=lambda x: x[1], cmp=cmp_str)
+                for t in temp:
+                    related_num.write(t[0] + '\t' + t[1] + '\n')
+    return final_data
 
 
 def read_tree():
@@ -82,7 +116,7 @@ def read_tree_file(treename):
     """
     leaf_to_path = {}
     att_tree = {}
-    prefix = 'data/informs_'
+    prefix = 'data/youtube_'
     postfix = ".txt"
     treefile = open(prefix + treename + postfix, 'rU')
     att_tree['*'] = GenTree('*')
