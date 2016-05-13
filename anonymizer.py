@@ -196,7 +196,15 @@ if __name__ == '__main__':
     elif FLAG == 'l':
         get_result_l(ATT_TREES, DATA)
     elif FLAG == 'data':
-        get_result_dataset(ATT_TREES, DATA)
+        k = DEFAULT_K
+        try:
+            k = int(sys.argv[3])
+        except:
+            pass
+        if k != DEFAULT_K:
+            get_result_dataset(ATT_TREES, DATA, k)
+        else:
+            get_result_dataset(ATT_TREES, DATA)
     elif FLAG == 'kl':
         get_result_kl(ATT_TREES, DATA)
     elif FLAG == '':
