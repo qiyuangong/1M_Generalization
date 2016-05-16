@@ -172,17 +172,17 @@ def find_median(partition, dim):
     return (splitVal, nextVal)
 
 
-def split_numeric_value(numeric_value, splitVal):
+def split_numerical_value(numeric_value, splitVal):
     """
     split numeric value on splitVal
     return sub ranges
     """
-    split_result = numeric_value.split(',')
-    if len(split_result) <= 1:
-        return split_result[0], split_result[0]
+    split_num = numeric_value.split(',')
+    if len(split_num) <= 1:
+        return split_num[0], split_num[0]
     else:
-        low = split_result[0]
-        high = split_result[1]
+        low = split_num[0]
+        high = split_num[1]
         # Fix 2,2 problem
         if low == splitVal:
             lvalue = low
@@ -195,96 +195,139 @@ def split_numeric_value(numeric_value, splitVal):
         return lvalue, rvalue
 
 
-def anonymize(partition):
+def split_numerical(partition, dim, pwidth, pmiddle):
     """
-    Main procedure of mondrian_l_diversity.
-    recursively partition groups until not allowable.
+        strict split numeric attribute by finding a median,
+        lhs = [low, means], rhs = (mean, high]
+        """
+    sub_partitions = []
+    # numeric attributes
+    (splitVal, nextVal, low, high) = find_median(partition, dim)
+    p_low = ATT_TREES[dim].dict[low]
+    p_high = ATT_TREES[dim].dict[high]
+    # update middle
+    if low == high:
+        pmiddle[dim] = low
+    else:
+        pmiddle[dim] = low + ',' + high
+    pwidth[dim] = (p_low, p_high)
+    if splitVal == '' or splitVal == nextVal:
+        # update middle
+        return []
+    middle_pos = ATT_TREES[dim].dict[splitVal]
+    lmiddle = pmiddle[:]
+    rmiddle = pmiddle[:]
+    lmiddle[dim], rmiddle[dim] = split_numerical_value(pmiddle[dim], splitVal)
+    lhs = []
+    rhs = []
+    for temp in partition.member:
+        pos = ATT_TREES[dim].dict[temp[dim]]
+        if pos <= middle_pos:
+            # lhs = [low, means]
+            lhs.append(temp)
+        else:
+            # rhs = (mean, high]
+            rhs.append(temp)
+    lwidth = pwidth[:]
+    rwidth = pwidth[:]
+    lwidth[dim] = (pwidth[dim][0], middle_pos)
+    rwidth[dim] = (ATT_TREES[dim].dict[nextVal], pwidth[dim][1])
+    if check_L_diversity(lhs) is False or check_L_diversity(rhs) is False:
+        return []
+    sub_partitions.append(Partition(lhs, lwidth, lmiddle))
+    sub_partitions.append(Partition(rhs, rwidth, rmiddle))
+    return sub_partitions
+
+
+def split_categorical(partition, dim, pwidth, pmiddle):
     """
-    # if len(partition) < GL_L * 2:
-    #     RESULT.append(partition)
-    #     return
-    allow_count = sum(partition.allow)
+    split categorical attribute using generalization hierarchy
+    """
+    sub_partitions = []
+    # categoric attributes
+    splitVal = ATT_TREES[dim][partition.middle[dim]]
+    sub_node = [t for t in splitVal.child]
+    sub_groups = []
+    for i in range(len(sub_node)):
+        sub_groups.append([])
+    if len(sub_groups) == 0:
+        # split is not necessary
+        return []
+    for temp in partition.member:
+        qid_value = temp[dim]
+        for i, node in enumerate(sub_node):
+            try:
+                node.cover[qid_value]
+                sub_groups[i].append(temp)
+                break
+            except KeyError:
+                continue
+        else:
+            print "Generalization hierarchy error!"
+    flag = True
+    for index, sub_group in enumerate(sub_groups):
+        if len(sub_group) == 0:
+            continue
+        if check_L_diversity(sub_group) is False:
+            flag = False
+            break
+    if flag:
+        for i, sub_group in enumerate(sub_groups):
+            if len(sub_group) == 0:
+                continue
+            wtemp = pwidth[:]
+            mtemp = pmiddle[:]
+            wtemp[dim] = len(sub_node[i])
+            mtemp[dim] = sub_node[i].value
+            sub_partitions.append(Partition(sub_group, wtemp, mtemp))
+    return sub_partitions
+
+
+def split_partition(partition, dim):
+    """
+    split partition and distribute records to different sub-partitions
+    """
     pwidth = partition.width
     pmiddle = partition.middle
-    for index in range(allow_count):
-        dim = choose_dimension(partition)
-        if dim == -1:
-            print "Error: dim=-1"
-            pdb.set_trace()
-        if IS_CAT[dim] is False:
-            # numeric attributes
-            (splitVal, nextVal) = find_median(partition, dim)
-            if splitVal == '':
-                partition.allow[dim] = 0
-                continue
-            middle_pos = ATT_TREES[dim].dict[splitVal]
-            lhs_middle = pmiddle[:]
-            rhs_middle = pmiddle[:]
-            lhs_middle[dim], rhs_middle[dim] = split_numeric_value(pmiddle[dim], splitVal)
-            lhs_width = pwidth[:]
-            rhs_width = pwidth[:]
-            lhs_width[dim] = (pwidth[dim][0], middle_pos)
-            rhs_width[dim] = (ATT_TREES[dim].dict[nextVal], pwidth[dim][1])
-            lhs = []
-            rhs = []
-            for record in partition.member:
-                pos = ATT_TREES[dim].dict[record[dim]]
-                if pos <= middle_pos:
-                    # lhs = [low, means]
-                    lhs.append(record)
-                else:
-                    # rhs = (means, high]
-                    rhs.append(record)
-            if check_L_diversity(lhs) is False or check_L_diversity(rhs) is False:
-                partition.allow[dim] = 0
-                continue
-            # anonymize sub-partition
-            anonymize(Partition(lhs, lhs_width, lhs_middle))
-            anonymize(Partition(rhs, rhs_width, rhs_middle))
-            return
-        else:
-            # normal attributes
-            split_node = ATT_TREES[dim][partition.middle[dim]]
-            if len(split_node.child) == 0:
-                partition.allow[dim] = 0
-                continue
-            sub_node = [t for t in split_node.child]
-            sub_partitions = []
-            for i in range(len(sub_node)):
-                sub_partitions.append([])
-            for record in partition.member:
-                qid_value = record[dim]
-                for i, node in enumerate(sub_node):
-                    try:
-                        node.cover[qid_value]
-                        sub_partitions[i].append(record)
-                        break
-                    except KeyError:
-                        continue
-                else:
-                    print "Generalization hierarchy error!"
-                    pdb.set_trace()
-            flag = True
-            for sub_partition in sub_partitions:
-                if len(sub_partition) == 0:
-                    continue
-                if check_L_diversity(sub_partition) is False:
-                    flag = False
-                    break
-            if flag:
-                for i, sub_partition in enumerate(sub_partitions):
-                    if len(sub_partition) == 0:
-                        continue
-                    wtemp = pwidth[:]
-                    mtemp = pmiddle[:]
-                    wtemp[dim] = len(sub_node[i])
-                    mtemp[dim] = sub_node[i].value
-                    anonymize(Partition(sub_partition, wtemp, mtemp))
-                return
-            else:
-                partition.allow[dim] = 0
-                continue
-    RESULT.append(partition)
+    if IS_CAT[dim] is False:
+        return split_numerical(partition, dim, pwidth, pmiddle)
+    else:
+        return split_categorical(partition, dim, pwidth, pmiddle)
+
+
+def anonymize(partition):
+    """
+    Main procedure of Half_Partition.
+    recursively partition groups until not allowable.
+    """
+    # print len(partition)
+    # print partition.allow
+    # pdb.set_trace()
+    if check_splitable(partition) is False:
+        RESULT.append(partition)
+        return
+    # Choose dim
+    dim = choose_dimension(partition)
+    if dim == -1:
+        print "Error: dim=-1"
+        pdb.set_trace()
+    sub_partitions = split_partition(partition, dim)
+    if len(sub_partitions) == 0:
+        partition.allow[dim] = 0
+        anonymize(partition)
+    else:
+        for sub_p in sub_partitions:
+            anonymize(sub_p)
+
+
+def check_splitable(partition):
+    """
+    Check if the partition can be further splited while satisfying k-anonymity.
+    """
+    temp = sum(partition.allow)
+    if temp == 0:
+        return False
+    return True
 
 
 def init(att_trees, data, L):
