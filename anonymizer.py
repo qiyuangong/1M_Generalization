@@ -166,11 +166,12 @@ def get_result_dataset(att_trees, data, k=DEFAULT_K, l=DEFAULT_L, n=10):
 
 if __name__ == '__main__':
     FLAG = ''
-    try:
+    DATA_SELECT = 'i'
+    if __DEBUG:
         print sys.argv
+    try:
         DATA_SELECT = sys.argv[1]
-        FLAG = sys.argv[2]
-    except:
+    except IndexError:
         DATA_SELECT = 'i'
     # read record
     print '*' * 30
@@ -191,6 +192,10 @@ if __name__ == '__main__':
         # gen_gh_trees(DATA_SELECT)
         ATT_TREES = read_informs_tree()
     # Separation_Gen need only GH for transaction
+    try:
+        FLAG = sys.argv[2]
+    except IndexError:
+        FLAG = ''
     if FLAG == 'k':
         get_result_k(ATT_TREES, DATA)
     elif FLAG == 'l':
@@ -220,7 +225,8 @@ if __name__ == '__main__':
             else:
                 get_result_one(ATT_TREES, DATA, INPUT_K)
         except ValueError:
-            print "Usage: python anonymizer [k | l | data]"
+            print "Usage: python anonymizer [i | y] [k | l | data]"
+            print "I:INFORMS, y:youtube"
             print "k: varying k"
             print "l: varying l"
             print "data: varying size of dataset"

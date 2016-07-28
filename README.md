@@ -8,3 +8,23 @@
 
 ## ATTENTION
 This project is the evaluation part of my new paper (not published). So don't use it without my permission.
+
+
+### Usage:
+My Implementation is based on Python 2.7 (not Python 3.0). Please make sure your Python environment is collect installed. You can run Mondrian in following steps:
+
+1) Download (or clone) the whole project.
+
+2) Run "anonymized.py" in root dir with CLI.
+
+    # Usage: python anonymizer [i | y] [k | l | data]
+    # I:INFORMS, y:youtube
+    # k: multiple experiments by varying k
+    # l: multiple experiments by varying l
+    # data: multiple experiments by varying size of dataset
+
+	# run Mondrian with default K(K=10)
+	python anonymizer.py
+
+	# run Mondrian with adult data, K=20
+	python anonymized.py a 20
